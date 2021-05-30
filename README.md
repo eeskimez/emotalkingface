@@ -49,17 +49,17 @@ Please download our model to the `model` folder.
 Inference from an image and speech file:
 
 ```
-python generate.py -im ../data/image_samples/img01.png -is ../data/speech_samples/speech01.wav -m ../model/ -o ../results/
+python generate.py -im ./data/image_samples/img01.png -is ./data/speech_samples/speech01.wav -m ./model/ -o ./results/
 ```
 
 Inference from processed dataset (h5py files):
 
 ```
-python generate_all_emotions.py -ih /path/to/h5py/folder/ -m ../model/ -o ../results/
+python generate_all_emotions.py -ih /path/to/h5py/folder/ -m ./model/ -o ./results/
 ```
 
 Inference from processed dataset (h5py files) - Mismatched emotions:
 
 ```
-python generate_mismatched_emotions.py -ih /path/to/h5py/folder/ -m ../model/ -o ../results/
+python generate_mismatched_emotions.py -ih /path/to/h5py/folder/ -m ./model/ -o ./results/
 ```
