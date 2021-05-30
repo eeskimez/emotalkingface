@@ -1,5 +1,7 @@
 # Speech Driven Talking Face Generation from a Single Image and an Emotion Condition
 
+[[Paper link](https://arxiv.org/pdf/2008.03592.pdf)]
+
 ## Installation
 
 ```
