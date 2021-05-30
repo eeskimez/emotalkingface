@@ -43,7 +43,8 @@ python train.py -i /train_hdf5_folder/ -v /val_hdf5_folder/ -o ../models/tface_e
 ## Inference
 Download our pretrained model (optional)
 
-link
+Please download our model to the `model` folder.
+[download here](https://drive.google.com/file/d/1evtS1N828JsAAzIS05NoJ2k-lKQFZtsX/view?usp=sharing)
 
 Inference from an image and speech file:
 
