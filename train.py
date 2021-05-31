@@ -201,5 +201,4 @@ def train():
         tface_trainer.train()
 
 if __name__ == "__main__":
-    # with torch.backends.cudnn.flags(enabled=False):
     train()

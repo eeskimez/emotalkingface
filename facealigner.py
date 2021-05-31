@@ -115,9 +115,6 @@ class FaceAligner:
         rightEyeCenter = mean_shape[right_eye, :].mean(axis=0)
         noseCenter = mean_shape[nose, :].mean(axis=0)
 
-        # print(leftEyeCenter)
-        # exit()
-
         template_points = np.float32([leftEyeCenter, rightEyeCenter, noseCenter])
 
         leftEyeCenter = shape[left_eye, :].mean(axis=0)
@@ -137,12 +134,6 @@ class FaceAligner:
         return output, None
 
     def align_three_points(self, image, shape, mean_shape, scale=None):
-        # shape = shape_to_np(shape)
-
-        # (lStart, lEnd) = FACIAL_LANDMARKS_68_IDXS["left_eye"]
-        # (rStart, rEnd) = FACIAL_LANDMARKS_68_IDXS["right_eye"]
-        # (nStart, nEnd) = FACIAL_LANDMARKS_68_IDXS["nose"]
-
         left_eye = [40, 39]
         right_eye = [42, 47]
         nose = [30, 31, 32, 33, 34, 35]
@@ -150,9 +141,6 @@ class FaceAligner:
         leftEyeCenter = mean_shape[left_eye, :].mean(axis=0)
         rightEyeCenter = mean_shape[right_eye, :].mean(axis=0)
         noseCenter = mean_shape[nose, :].mean(axis=0)
-
-        # print(leftEyeCenter)
-        # exit()
 
         template_points = np.float32([leftEyeCenter, rightEyeCenter, noseCenter])
 
