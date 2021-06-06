@@ -14,6 +14,11 @@ pip install -r requirements
 
 The code is tested on Ubuntu 18.04 and OS X 10.15.2.
 
+## Prepare data with HDF5
+```
+python data_prep/prepare_data.py -i /path_to_original_videos/ -o /path_to_store_features/
+```
+
 ## Train
 
 Start visdom server:
