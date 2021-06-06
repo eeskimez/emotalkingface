@@ -5,7 +5,7 @@
 ## Installation
 
 ```
-pip install -r requirements
+pip install -r requirements.txt
 ```
 
 #### It also depends on the following packages:

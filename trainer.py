@@ -12,13 +12,7 @@ class perceptionLoss():
         vgg = torchvision.models.vgg19(pretrained=True)
         vgg.eval()
         self.features = vgg.features.to(args.device)
-        # print(self.features)
-        # exit()
-        # self.feature_layers = ['3', '8']#, '17', '26', '35']
         self.feature_layers = ['4', '9', '18', '27', '36']
-        # self.feature_layers = ['4', '9', '18']
-        # self.feature_layers = ['4', '9', '18']
-        # self.feature_layers = ['4', '9']
         self.mse_loss = nn.MSELoss()
 
     def getfeatures(self, x):
@@ -252,7 +246,6 @@ class tfaceTrainer:
             loss_df = self.calcGANLoss(df, 'real')
         if self.args.disc_emo:
             de_c = self.disc_emo.forward(image_c, video_pd)
-            # loss_de = self.calcGANLoss(de, 'real')
             loss_de_c = self.emo_loss(de_c, torch.argmax(emotion, dim=1))
             self.loss_dict['loss_de_c'].append(loss_de_c.item())
 
@@ -266,7 +259,7 @@ class tfaceTrainer:
         self.loss_dict['loss_emo'].append(emo_loss.item())
         self.loss_dict['perception_loss'].append(perception_loss.item())        
 
-        loss = 0.001*emo_loss + recon_loss + perception_loss #+ recon_loss
+        loss = 0.001*emo_loss + recon_loss + perception_loss
         if self.args.disc_frame:
             loss += self.args.disc_frame * loss_df
         if self.args.disc_emo:
@@ -299,7 +292,7 @@ class tfaceTrainer:
                     mrm = mrm + 0.01
 
                     rnd_idx = 0
-                    # rnd_idx = np.random.randint(video.shape[1], size=1)[0]
+                    # rnd_idx = np.random.randint(video.shape[1], size=1)[0] # Using first frame of the sequence provides better results, using random images might be more robust
                     image_c = video[:, rnd_idx, :, :, :]
 
                     data = [speech, video, mrm, emotion, image_c]
@@ -334,7 +327,6 @@ class tfaceTrainer:
     def pre_train(self):
         for epoch in tqdm(range(self.args.num_epochs)):
             diterator = iter(self.train_loader)
-            # with trange(1) as t:
             with trange(len(self.train_loader)) as t:     
                 for i in t:               
                     speech, video, mrm, emotion = [d.float().to(self.args.device) for d in next(diterator)]
@@ -351,7 +343,6 @@ class tfaceTrainer:
                     self.logLosses(t)
 
                     if self.global_step % 500 == 0:
-                        # self.logValImages(epoch)
                         self.saveNetworks('inter')
 
                     self.global_step += 1
