@@ -37,12 +37,12 @@ def initParams():
     parser.add_argument('--num_frames', type=int, default=25)
     parser.add_argument('--context', type=int, default=17)
 
-    parser.add_argument('--env_name', type=str, default='tface_emo_v2')
+    parser.add_argument('--env_name', type=str, default='tface_emo')
 
     parser.add_argument('--num_epochs', type=int, default=1000)
     parser.add_argument("--batch-size", type=int, default=8)
 
-    parser.add_argument('--lr_g', type=float, default=1e-07)
+    parser.add_argument('--lr_g', type=float, default=1e-05)
     parser.add_argument('--lr_pair', type=float, default=1e-05)
     parser.add_argument('--lr_frame', type=float, default=1e-06)
     parser.add_argument('--lr_emo', type=float, default=1e-06)

@@ -38,12 +38,16 @@ other = [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], \
 faceLmarkLookup = Mouth + Nose + leftBrow + rightBrow + leftEye + rightEye + other
 
 def write_video_cv(frames, speech, fs, path, fname, fps):
-    fname = os.path.splitext(fname)[0]
+    # fname = os.path.splitext(fname)[0]
+    print(os.path.join(path, fname))
+    # exit()
     out = cv2.VideoWriter(os.path.join(path, fname), cv2.VideoWriter_fourcc('m', 'p', '4', 'v'), fps, (frames.shape[1], frames.shape[2]), (True if len(frames.shape) == 4 else False))
+    # exit()
     if out.isOpened():
         for i in range(frames.shape[0]):
             out.write(frames[i, ...])
     out.release()
+    # exit()
     # print(speech.shape)
     # scipy.io.wavfile.write(os.path.join(path, fname+'.wav'), fs, speech)
     librosa.output.write_wav(os.path.join(path, fname+'.wav'), speech, fs)

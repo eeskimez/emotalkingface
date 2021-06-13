@@ -6,6 +6,7 @@ import torch.nn as nn
 from tqdm import tqdm, trange
 import torchvision
 import utils
+from torch.utils.tensorboard import SummaryWriter
 
 class perceptionLoss():
     def __init__(self, args):
@@ -56,7 +57,8 @@ class tfaceTrainer:
         self.disc_emo = disc_emo
         self.disc_video = disc_video
 
-        self.plotter = utils.VisdomLinePlotter(env=args.env_name)
+        # self.plotter = utils.VisdomLinePlotter(env=args.env_name)
+        self.plotter = SummaryWriter(args.out_path)
 
         self.l1_loss = torch.nn.L1Loss()
         self.emo_loss = nn.CrossEntropyLoss()
@@ -130,15 +132,23 @@ class tfaceTrainer:
 
     def plotLosses(self, var_name, xlabel, ylabel, legend, title, rem=0):
         if self.global_step%self.args.plot_interval == rem:
-            x = []
-            y = []
             for key in legend:
-                y.append(np.nanmean(self.loss_dict[key][-5:]))
-                x.append(self.global_step)
-            self.plotter.plot(var_name, xlabel, ylabel, legend, title, x, y)
+                try:
+                    self.plotter.add_scalar("Loss/train", self.loss_dict[key][-1], self.global_step)
+                except:
+                    continue
+        
+        # Visdom Plotter
+        # if self.global_step%self.args.plot_interval == rem:
+        #     x = []
+        #     y = []
+        #     for key in legend:
+        #         y.append(np.nanmean(self.loss_dict[key][-5:]))
+        #         x.append(self.global_step)
+        #     self.plotter.plot(var_name, xlabel, ylabel, legend, title, x, y)
 
     def convertVid(self, V):
-        return 255*(0.5 + (V[:, [2, 1, 0], :, :]/2.0))
+        return (0.5 + (V/2.0))
 
     def logValImages(self, epoch):
         speech_v, video_v, att_v, emotion_v = [d.float().to(self.args.device) for d in next(iter(self.val_loader))]
@@ -151,12 +161,16 @@ class tfaceTrainer:
         pd_video_v = pd_video_v.view(pd_video_v.size(0) * pd_video_v.size(1), pd_video_v.size(2), pd_video_v.size(3), pd_video_v.size(4))
         video_v_p = video_v_p.view(video_v_p.size(0) * video_v_p.size(1), video_v_p.size(2), video_v_p.size(3), video_v_p.size(4))
 
-        self.plotter.viz.images( self.convertVid( torch.cat((pd_video_v[:, :, :, :], video_v_p[:, :, :, :]), 0) ), 
-                                opts=dict(jpgquality=70, store_history=False, caption='e'+str(epoch)+"_check_"+str(self.global_step),title='e'+str(epoch)+"_check_"+str(self.global_step)),
-                                env=self.args.env_name,
-                                win='samples',
-                                nrow=self.args.num_frames,
-                                )
+        grid = torchvision.utils.make_grid(self.convertVid( torch.cat((pd_video_v[:, :, :, :], video_v_p[:, :, :, :]), 0) ))
+        self.plotter.add_image("Predicted and GT Video Frames", grid, self.global_step)
+        
+        # Visdom Plotter
+        # self.plotter.viz.images( self.convertVid( torch.cat((pd_video_v[:, :, :, :], video_v_p[:, :, :, :]), 0) ), 
+        #                         opts=dict(jpgquality=70, store_history=False, caption='e'+str(epoch)+"_check_"+str(self.global_step),title='e'+str(epoch)+"_check_"+str(self.global_step)),
+        #                         env=self.args.env_name,
+        #                         win='samples',
+        #                         nrow=self.args.num_frames,
+        #                         )
 
     def step_disc_frame(self, data):
         self.disc_frame.train()
@@ -312,7 +326,7 @@ class tfaceTrainer:
                         if self.args.disc_emo:
                             self.step_disc_emo(data)
                             
-                    if self.global_step % 500 == 0:
+                    if self.global_step % 50 == 0:
                         self.logValImages(epoch)
                         self.saveNetworks('inter')
 

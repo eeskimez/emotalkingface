@@ -36,11 +36,11 @@ rn.seed(123)
 #----------------PARSER------------------#
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("-i", "--input-folder", type=str, help='Path to folder that contains video files')
-parser.add_argument("-p", "--pred-path", type=str, help="Predictor Path", default='../dlib_data/shape_predictor_68_face_landmarks.dat')
-parser.add_argument("-ti", "--temp-img", type=str, help="Template face image path", default='template_face.jpg')
+parser.add_argument("-p", "--pred-path", type=str, help="Predictor Path", default='data/dlib_data/shape_predictor_68_face_landmarks.dat')
+parser.add_argument("-ti", "--temp-img", type=str, help="Template face image path", default='data_prep/template_face.jpg')
 parser.add_argument("-fs", "--fs", type=int, help='sampling rate', default=8000)
-parser.add_argument("-nw", "--nw", type=int, help='num workers', default=16)
-parser.add_argument("-m", "--mode", type=int, help='Mode 0: Aligns all frames, Mode 1: Uses first frame to align all frames', default=0)
+parser.add_argument("-nw", "--nw", type=int, help='num workers', default=1)
+parser.add_argument("-m", "--mode", type=int, help='Mode 0: Aligns all frames, Mode 1: Uses first frame to align all frames', default=1)
 parser.add_argument("-d", "--debug", type=bool, help='Writes videos for debug purposes', default=False)
 parser.add_argument("-o", "--out-path", type=str, help='Output path')
 args = parser.parse_args()
@@ -101,10 +101,12 @@ class Extractor():
         self.mean_shape = mean_shape
         for root, dirnames, filenames in os.walk(in_path):
             for filename in filenames:
-                if os.path.splitext(filename)[1] == '.mp4' or os.path.splitext(filename)[1] == '.mpg' or os.path.splitext(filename)[1] == '.mov':
+                if os.path.splitext(filename)[1] == '.mp4' or os.path.splitext(filename)[1] == '.mpg' or os.path.splitext(filename)[1] == '.mov' or os.path.splitext(filename)[1] == '.flv':
                     self.fileList.append((root, filename))
         
         self.fileList = self.fileList[:]
+        print(self.fileList)
+        # exit()
         
     def processSample(self, process_id):
             import librosa
@@ -114,7 +116,9 @@ class Extractor():
                 sampleList = list(range(process_id*increment, n))
             else:
                 sampleList = list(range(process_id*increment, (process_id+1)*increment))
-            print(process_id, len(sampleList))
+            print(process_id, len(sampleList), n,  process_id*increment, (process_id+1)*increment)
+
+            # exit()
 
             detector = dlib.get_frontal_face_detector()
             predictor = dlib.shape_predictor(predictor_path)
@@ -124,6 +128,7 @@ class Extractor():
             shuffle(sampleList)
 
             for j in tqdm(sampleList): 
+                print(j)
                 root, filename = self.fileList[j]
                 
                 y, sr = librosa.load(os.path.join(root, filename), sr=fs)
@@ -230,25 +235,25 @@ if __name__ == '__main__':
     cnt = 0
     ext = Extractor(in_path, mean_shape)
 
-    ext.processSample(0)
-    exit()
-    
-    processes = []
-    for i in range(num_processes):
-        processes.append(Process(target=ext.processSample, args=(i, )))
-    
-    for i, p in enumerate(processes):
-        # p.daemon = True
+    if num_processes < 2:
+        ext.processSample(0)
+    else:
+        processes = []
+        for i in range(num_processes):
+            processes.append(Process(target=ext.processSample, args=(i, )))
+        
+        for i, p in enumerate(processes):
+            # p.daemon = True
+            p.start()
+            print('Process #', i)
+        
+        p = Process(target=ext.writeToFile, args=())
         p.start()
-        print('Process #', i)
-    
-    p = Process(target=ext.writeToFile, args=())
-    p.start()
-    p.join()
-    print('Main joined.')
-
-    for i, p in enumerate(processes):
         p.join()
-        print('Joined #', i)
+        print('Main joined.')
+
+        for i, p in enumerate(processes):
+            p.join()
+            print('Joined #', i)
     
 
