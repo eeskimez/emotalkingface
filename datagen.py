@@ -125,7 +125,7 @@ class FaceDset(Dataset):
        
         dset = h5py.File(os.path.join(*filename), 'r')
 
-        idx = np.random.randint(dset['video'].shape[0]-self.args.num_frames, size=1)[0]
+        idx = np.random.randint(max(1, dset['video'].shape[0]-self.args.num_frames), size=1)[0]
      
         video = dset['video'][idx:idx+self.args.num_frames, :, :, :]
         lmarks = dset['lmarks'][idx:idx+self.args.num_frames, 48:, :]
