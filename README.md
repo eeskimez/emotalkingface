@@ -15,9 +15,10 @@ pip install -r requirements.txt
 The code is tested on Ubuntu 18.04 and OS X 10.15.2. 
 
 If you have troubles with D-Lib (especially for Windows), please use conda install instead of pip:
-'''
+
+```
 conda install -c conda-forge dlib
-'''
+```
 
 ## Download Data
 You can download the data from this [repo](https://github.com/CheyneyComputerScience/CREMA-D).
@@ -25,9 +26,9 @@ You can download the data from this [repo](https://github.com/CheyneyComputerSci
 
 ## Convert Videos to 25 FPS
 Run the following code:
-'''
+```
 python .\data_prep\convertFPS.py -i \raw_video_folder -o \output_folder
-'''
+```
 
 ## Prepare Data
 ```
@@ -56,10 +57,8 @@ python train.py -i /train_hdf5_folder/ -v /val_hdf5_folder/ -o ../models/tface_e
 By default, the Tensorboard log file is written to the output path. You can check the intermediate video results and loss values using Tensorboard.
 
 ## Inference
-Download our pretrained model (optional)
 
-Please download our model to the `model` folder.
-[download here](https://drive.google.com/file/d/1evtS1N828JsAAzIS05NoJ2k-lKQFZtsX/view?usp=sharing)
+Download our pretrained model (optional): Please put pre-trained [model](https://drive.google.com/file/d/1evtS1N828JsAAzIS05NoJ2k-lKQFZtsX/view?usp=sharing) in the `model` folder.
 
 Inference from an image and speech file:
 
@@ -77,4 +76,17 @@ Inference from processed dataset (h5py files) - Mismatched emotions:
 
 ```
 python generate_mismatched_emotions.py -ih /path/to/h5py/folder/ -m ./model/ -o ./results/
+```
+
+## Acknowledgment
+We use the following convolutional rnn [repo](https://github.com/kamo-naoyuki/pytorch_convolutional_rnn).
+
+## Citation
+```
+@ARTICLE{seeskimezemotface,
+    title={Speech Driven Talking Face Generation from a Single Image and an Emotion Condition},
+    author={Eskimez, Sefik Emre and Zhang, You and Duan, Zhiyao},
+    journal={arXiv preprint arXiv:2008.03592},
+    year={2020}
+}
 ```
