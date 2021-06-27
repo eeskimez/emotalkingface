@@ -10,7 +10,7 @@
 pip install -r requirements.txt
 ```
 
-#### It also depends on the following packages:
+#### It depends on the following packages:
 * ffmpeg
 * OpenCV
 
@@ -81,7 +81,7 @@ python generate_mismatched_emotions.py -ih /path/to/h5py/folder/ -m ./model/ -o 
 ```
 
 ## Acknowledgment
-We use the following convolutional rnn [repo](https://github.com/kamo-naoyuki/pytorch_convolutional_rnn).
+We thank the authors of the following [repo](https://github.com/kamo-naoyuki/pytorch_convolutional_rnn).
 
 ## Citation
 ```
