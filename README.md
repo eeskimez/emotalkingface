@@ -2,6 +2,8 @@
 
 [[Paper link](https://arxiv.org/pdf/2008.03592.pdf)]
 
+Each row shows 6 videos created using the same image and speech but with different emotion input. Columns represent  `anger`, `disgust`, `fear`, `happiness`, `neutral`, and `sadness`, respectively.
+
 ![screen-gif](./assets/example.gif.gif)
 
 ## Installation
