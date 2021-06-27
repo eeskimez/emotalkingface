@@ -82,11 +82,12 @@ class TemplateProcessor():
 batchsize = 1
 
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument("-is", "--speech-file", type=str, help="input speech file")
-parser.add_argument("-im", "--img-file", type=str, help="input image file")
+parser.add_argument("-is", "--speech-file", type=str, help="input speech file", default=None)
+parser.add_argument("-im", "--img-file", type=str, help="input image file", default=None)
+parser.add_argument("-ih", "--hdf5-file", type=str, help="input hdf5 file", default=None)
 parser.add_argument("-m", "--model", type=str, help="DNN model to use")
-parser.add_argument("-p", "--pred-path", type=str, help="Predictor Path", default='../data/shape_predictor_68_face_landmarks.dat')
-parser.add_argument("-ti", "--temp-img", type=str, help="Template face image path", default='../data_prep/template_face.jpg')
+parser.add_argument("-p", "--pred-path", type=str, help="Predictor Path", default='data/dlib_data/shape_predictor_68_face_landmarks.dat')
+parser.add_argument("-ti", "--temp-img", type=str, help="Template face image path", default='data_prep/template_face.jpg')
 parser.add_argument("-o", "--out-fold", type=str, help="output folder")
 parser.add_argument("--gpu", type=str, help="GPU index", default="1")
 args = parser.parse_args()
@@ -131,21 +132,31 @@ fa = FaceAligner(predictor, desiredLeftEye=(0.25, 0.25), desiredFaceWidth=128)
 
 offset = 100
 cnt = 0
+if args.speech_file:
+    speech, sr = librosa.load(args.speech_file, sr=args.fs)
+    speech = speech / np.max(np.abs(speech))
 
-I = cv2.imread(args.img_file)
-if I.shape[0] != I.shape[1] or I.shape[1] != 128:
-    I_gray = cv2.cvtColor(I, cv2.COLOR_BGR2GRAY)
-
-    dets = detector(I, 1)       
-    for k, d in enumerate(dets):
-        shape = predictor(I_gray, d)
-    I, scale = fa.align_three_points(I, shape_to_np(shape), mean_shape, None)
-
-    I = cv2.resize(I, (128, 128))
-    # I = cv2.cvtColor(I, cv2.COLOR_BGR2RGB)
+if args.hdf5_file:
+    dset = h5py.File(os.path.join(args.hdf5_file), 'r')
+    condition = dset['video'][0, :, :, :]
+    if not args.speech_file:
+        speech = dset['speech'][:]
+    sr = 8000
 else:
-    print('Image file is not valid...')
-    exit()
+    I = cv2.imread(args.img_file)
+    if I.shape[0] != I.shape[1] or I.shape[1] != 128:
+        I_gray = cv2.cvtColor(I, cv2.COLOR_BGR2GRAY)
+
+        dets = detector(I, 1)       
+        for k, d in enumerate(dets):
+            shape = predictor(I_gray, d)
+        I, scale = fa.align_three_points(I, shape_to_np(shape), mean_shape, None)
+
+        condition = cv2.resize(I, (128, 128))
+        # I = cv2.cvtColor(I, cv2.COLOR_BGR2RGB)
+    else:
+        print('Image file is not valid...')
+        exit()
 
 def deNormImg(img):
     img = np.moveaxis(255.0*img, 0, 2).astype(np.uint8)
@@ -169,16 +180,13 @@ noise_sampler = normal.Normal(0, 1)
 
 emotion_dict = {0:'ANG', 1:'DIS', 2:'FEA', 3:'HAP', 4:'NEU', 5:'SAD'}
 
+cv2.imwrite(os.path.join(args.out_fold, 'condition.png'), condition)
+
 generator.eval()
 cnt = 0
 with torch.no_grad():
-    speech, sr = librosa.load(args.speech_file, sr=args.fs)
-    speech = speech / np.max(np.abs(speech))
-
     speech = np.reshape(speech, (1, 1, speech.shape[0]))
     speech_t = torch.from_numpy(speech).float()
-
-    condition = I
 
     normed_c = normTransform(image=condition)
     image_c = normed_c['image']

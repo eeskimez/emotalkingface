@@ -2,6 +2,8 @@
 
 [[Paper link](https://arxiv.org/pdf/2008.03592.pdf)]
 
+![screen-gif](./assets/example.gif.gif)
+
 ## Installation
 
 ```
