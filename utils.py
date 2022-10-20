@@ -12,7 +12,9 @@ import numpy as np
 import cv2
 import math
 import copy
-import librosa
+#import librosa  # lrpDisabled as below it is no longer supporting .sound from v0.8
+import soundfile as sf # lrpAdd to replace librosa
+
 # import dlib
 import subprocess
 from tqdm import tqdm
@@ -112,7 +114,10 @@ def write_video_cv(frames, speech, fs, path, fname, fps):
     out.release()
 
 
-    librosa.output.write_wav(os.path.join(path, fname+'.wav'), speech, fs)
+    #librosa no longer has output from v0.8 lrpAdd
+    #librosa.output.write_wav(os.path.join(path, fname+'.wav'), speech, fs)
+    sf.write(os.path.join(path, fname+'.wav').format(chr(int(i/50)+65)), speech, fs)
+
 
     cmd = 'ffmpeg -i '+os.path.join(path, fname)+' -i '+os.path.join(path, fname)+'.wav -c:v copy -c:a aac -strict experimental -map 0:v:0 -map 1:a:0  '+os.path.join(path, fname)+'_.mp4'
     subprocess.call(cmd, shell=True) 
@@ -304,7 +309,11 @@ def write_video(frames, sound, fs, path, fname, fps, cmap='jet'):
     fig = plt.figure(figsize=(10, 10))
     l = plt.imshow(frames[0], cmap=cmap)
 
-    librosa.output.write_wav(os.path.join(path, fname+'.wav'), sound, fs)
+
+    #librosa no longer has output from v0.8 lrpAdd
+    #librosa.output.write_wav(os.path.join(path, fname+'.wav'), sound, fs)
+    sf.write(os.path.join(path, fname+'.wav').format(chr(int(i/50)+65)), sound, fs)
+
 
     with writer.saving(fig, os.path.join(path, fname+'.mp4'), 150):
         # plt.gca().invert_yaxis()
@@ -348,7 +357,11 @@ def write_video_FLM(frames, sound, fs, path, fname, xLim, yLim, fps=29.97):
     plt.xlim(xLim)
     plt.ylim(yLim)
 
-    librosa.output.write_wav(os.path.join(path, fname+'.wav'), sound, fs)
+    #librosa no longer has output from v0.8 lrpAdd
+    #librosa.output.write_wav(os.path.join(path, fname+'.wav'), sound, fs)
+    sf.write(os.path.join(path, fname+'.wav').format(chr(int(i/50)+65)), sound, fs)
+
+
 
     if frames.shape[1] == 20:
         lookup = [[x[0] - 48, x[1] - 48] for x in Mouth]

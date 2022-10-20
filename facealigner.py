@@ -86,11 +86,17 @@ class FaceAligner:
 
         # compute center (x, y)-coordinates (i.e., the median point)
         # between the two eyes in the input image
-        eyesCenter = ((leftEyeCenter[0] + rightEyeCenter[0]) // 2,
-            (leftEyeCenter[1] + rightEyeCenter[1]) // 2)
+        #eyesCenter = ((leftEyeCenter[0] + rightEyeCenter[0]) // 2,
+        eyesCenter = (int((leftEyeCenter[0] + rightEyeCenter[0]) // 2),# lrpAdd int, so now it is working
+            int((leftEyeCenter[1] + rightEyeCenter[1]) // 2))
+        #print(eyesCenter) # lrpAdd
+        #return
 
         # grab the rotation matrix for rotating and scaling the face
-        M = cv2.getRotationMatrix2D(eyesCenter, angle, scale)
+        #print('eyesCenter:'+str(type(eyesCenter)))#tuple
+        #print('angle:'+str(type(angle)))
+        #print('scale'+str(type(scale)))
+        M = cv2.getRotationMatrix2D(eyesCenter, angle, scale)#lrpAdd int to all
 
         # update the translation component of the matrix
         tX = self.desiredFaceWidth * 0.5
