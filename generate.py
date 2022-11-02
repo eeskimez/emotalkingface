@@ -136,6 +136,8 @@ if args.speech_file:
     speech, sr = librosa.load(args.speech_file, sr=args.fs)
     speech = speech / np.max(np.abs(speech))
 
+
+condition = None # lrpAdd to prevent error and keep previous one if error
 if args.hdf5_file:
     dset = h5py.File(os.path.join(args.hdf5_file), 'r')
     condition = dset['video'][0, :, :, :]
@@ -144,7 +146,9 @@ if args.hdf5_file:
     sr = 8000
 else:
     I = cv2.imread(args.img_file)
-    if I.shape[0] != I.shape[1] or I.shape[1] != 128:
+    #print(I)
+    #exit() 
+    if I.shape[0] != I.shape[1] or I.shape[1] != 128 or 9 == 9:
         I_gray = cv2.cvtColor(I, cv2.COLOR_BGR2GRAY)
 
         dets = detector(I, 1)       
@@ -153,10 +157,12 @@ else:
         I, scale = fa.align_three_points(I, shape_to_np(shape), mean_shape, None)
 
         condition = cv2.resize(I, (128, 128))
+        condition_memory = condition # lrpAdd
         # I = cv2.cvtColor(I, cv2.COLOR_BGR2RGB)
     else:
         print('Image file is not valid...')
-        exit()
+        condition = condition_memory #lrpAdd
+        #exit()#lrpDisabled this line
 
 def deNormImg(img):
     img = np.moveaxis(255.0*img, 0, 2).astype(np.uint8)
