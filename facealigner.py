@@ -86,17 +86,10 @@ class FaceAligner:
 
         # compute center (x, y)-coordinates (i.e., the median point)
         # between the two eyes in the input image
-        #eyesCenter = ((leftEyeCenter[0] + rightEyeCenter[0]) // 2,
-        eyesCenter = (int((leftEyeCenter[0] + rightEyeCenter[0]) // 2),# lrpAdd int, so now it is working
-            int((leftEyeCenter[1] + rightEyeCenter[1]) // 2))
-        #print(eyesCenter) # lrpAdd
-        #return
+        eyesCenter = (round((leftEyeCenter[0] + rightEyeCenter[0]) // 2), round((leftEyeCenter[1] + rightEyeCenter[1]) // 2))
 
         # grab the rotation matrix for rotating and scaling the face
-        #print('eyesCenter:'+str(type(eyesCenter)))#tuple
-        #print('angle:'+str(type(angle)))
-        #print('scale'+str(type(scale)))
-        M = cv2.getRotationMatrix2D(eyesCenter, angle, scale)#lrpAdd int to all
+        M = cv2.getRotationMatrix2D(eyesCenter, angle, scale)
 
         # update the translation component of the matrix
         tX = self.desiredFaceWidth * 0.5
@@ -121,6 +114,9 @@ class FaceAligner:
         rightEyeCenter = mean_shape[right_eye, :].mean(axis=0)
         noseCenter = mean_shape[nose, :].mean(axis=0)
 
+        # print(leftEyeCenter)
+        # exit()
+
         template_points = np.float32([leftEyeCenter, rightEyeCenter, noseCenter])
 
         leftEyeCenter = shape[left_eye, :].mean(axis=0)
@@ -140,6 +136,12 @@ class FaceAligner:
         return output, None
 
     def align_three_points(self, image, shape, mean_shape, scale=None):
+        # shape = shape_to_np(shape)
+
+        # (lStart, lEnd) = FACIAL_LANDMARKS_68_IDXS["left_eye"]
+        # (rStart, rEnd) = FACIAL_LANDMARKS_68_IDXS["right_eye"]
+        # (nStart, nEnd) = FACIAL_LANDMARKS_68_IDXS["nose"]
+
         left_eye = [40, 39]
         right_eye = [42, 47]
         nose = [30, 31, 32, 33, 34, 35]
@@ -147,6 +149,9 @@ class FaceAligner:
         leftEyeCenter = mean_shape[left_eye, :].mean(axis=0)
         rightEyeCenter = mean_shape[right_eye, :].mean(axis=0)
         noseCenter = mean_shape[nose, :].mean(axis=0)
+
+        # print(leftEyeCenter)
+        # exit()
 
         template_points = np.float32([leftEyeCenter, rightEyeCenter, noseCenter])
 
